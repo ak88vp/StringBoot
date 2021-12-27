@@ -1,6 +1,7 @@
 package ak88.service;
 
 import ak88.model.Category;
+import ak88.model.Product;
 import ak88.repository.ICategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,9 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.findById(id);
     }
     @Override
-    public void save(Category category) {
+    public Product save(Category category) {
         categoryRepository.save(category);
+        return null;
     }
     @Override
     public void remove(Long id) {

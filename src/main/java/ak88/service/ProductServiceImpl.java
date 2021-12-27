@@ -40,8 +40,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void save(Product product) {
+    public Product save(Product product) {
         iProductRepository.save(product);
+        return product;
     }
     @Override
     public void remove(Long id) {

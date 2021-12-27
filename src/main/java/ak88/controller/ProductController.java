@@ -1,5 +1,6 @@
 package ak88.controller;
 
+import ak88.model.Cart;
 import ak88.model.Category;
 import ak88.model.Product;
 import ak88.service.CategoryService;
@@ -21,6 +22,7 @@ import java.util.Optional;
 
 @RequestMapping("/products")
 @Controller
+@SessionAttributes("cart")
 public class ProductController {
     @Autowired
     ProductService productService;
@@ -28,6 +30,10 @@ public class ProductController {
     @Autowired
     CategoryService categoryService;
 
+    @ModelAttribute("cart")
+    public Cart setupCart() {
+        return new Cart();
+    }
     @ModelAttribute("categorys")
     public Iterable<Category> categories() {
         return categoryService.findAll();
@@ -79,6 +85,19 @@ public class ProductController {
         productService.remove(id);
         return "redirect:/products";
     }
+    @GetMapping("add/{id}")
+    public String addToCart(@PathVariable Long id, @ModelAttribute Cart cart, String action) {
+        Optional<Product> productOptional = productService.findById(id);
+        if (!productOptional.isPresent()) {
+            return "/error.404";
+        }
+        if (action.equals("show")) {
+            cart.addProduct(productOptional.get());
+            return "redirect:/shopping-cart";
+        }
+        cart.addProduct(productOptional.get());
+        return "redirect:/products";
+    }
     @GetMapping("findCategory")
     public String findCategory(Long idCategory,Pageable pageable,Model model){
         Optional<Category> category=categoryService.findById(idCategory);
@@ -101,4 +120,5 @@ public class ProductController {
         productService.save(product);
         return "redirect:/products";
     }
+
 }

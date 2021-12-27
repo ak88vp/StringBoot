@@ -49,6 +49,7 @@
     <br>
     <br>
     <br>
+    <a href="/shopping-cart" class="btn btn-primary" style="background: #d21d1d">Your cart</a>
     <div class="center-pill">
         <div class="row">
             <div class="offset-1"></div>
@@ -90,6 +91,7 @@
                         <th scope="col">Category</th>
                         <th scope="col">Edit</th>
                         <th scope="col">Delete</th>
+                        <th scope="col">Cart</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -107,6 +109,7 @@
                                            event.preventDefault();};"
                                    title="Link Title"
                             >Delete</a></td>
+                            <td><a th:href="@{/products/add/__${product.id}__(action='list')}">Add To Cart</a></td>
                         </tr>
                     </th:block>
                     </tbody>
