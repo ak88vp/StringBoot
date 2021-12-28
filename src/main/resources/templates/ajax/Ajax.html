@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        table, th, td {
+            border: 1px solid #d21d1d;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+    </style>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        function getAllStudent() {
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/api/products",
+                success: function (nal) {
+                    console.log(nal)
+                    display(nal.content)
+                }
+            })
+        }
+
+        function showFormAddStudent() {
+
+            let form = '<input type="text" id="name">\n' +
+                '<input type="text" id="price">\n' +
+                '<input type="text" id="img">\n' +
+                '<select name="" id="idCategory">'
+
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                type: "GET",
+                url: "http://localhost:8080/api/products/category",
+                success: function (nal) {
+                    console.log(nal)
+                    for (let i = 0; i < nal.length; i++) {
+                        form += `<option value="${nal[i].id}">${nal[i].name}</option>`
+                    }
+                    form += '</select>' + '<button onclick="saveProduct()">thêm</button>'
+                    document.getElementById("pr").innerHTML = form
+                }
+                ,
+                error: function (error) {
+                }
+            });
+
+        }
+
+        function saveProduct() {
+            let name = document.getElementById("name").value;
+            let price = document.getElementById("price").value;
+            let img = document.getElementById("img").value;
+            let idCategory = document.getElementById("idCategory").value;
+            let nal = {
+                name: name,
+                price: price,
+                img: img,
+                category: {
+                    id: idCategory
+                }
+            }
+            console.log(nal)
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                type: "POST",
+                url: "http://localhost:8080/api/products",
+                data: JSON.stringify(nal),
+                success: getAllStudent,
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+
+        }
+
+        function display(array) {
+            let res = "<table border='1px'>" + "<tr>" + "<th>Tên</th>" + "<th> giá</th>" + "<th> thể loại</th>" + "<th>edit</th>" + "<th>delete</th>" +
+                "</tr>"
+
+            for (let i = 0; i < array.length; i++) {
+                res += "<tr>" + "<td>" + array[i].name + "</td>"
+                    + "<td>" + array[i].price + "</td>" +
+                    "<td>" + array[i].category.name + "</td>" +
+                    "<td>" + " <button onclick='showFormEdit(" + array[i].id + ")'>edit</button>" + "</td>" +
+                    "<td>" + " <button onclick='deleteById(" + array[i].id + ")'>DELETE</button>" + "</td>" +
+                    "<td>" + " <button onclick='findOne(" + array[i].id + ")'>profile</button>" + "</td>" + "</tr>"
+            }
+            res += "</table>"
+            document.getElementById("pr").innerHTML = res
+        }
+
+        function showFormEdit(id) {
+            let res = "";
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/api/products/" + id,
+                success: function (nal) {
+                    console.log(nal)
+                    res += '<input type="text" placeholder="tên sản phẩm" id="name" value="' + nal.name + '">\n' +
+                        '    <input type="text" placeholder="giá" id="price" value="' + nal.price + '">\n' +
+                        '    <input type="text" placeholder="ảnh" id="img" value="' + nal.img + '">\n' +
+                        '<select name="" id="idCategory">\n';
+                    $.ajax({
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        type: "GET",
+                        url: "http://localhost:8080/api/products/category",
+                        success: function (category) {
+                            console.log(category)
+                            for (let i = 0; i < category.length; i++) {
+                                res += `<option value="${category[i].id}">${category[i].name}</option>`
+                            }
+                            res += '</select>\n' +
+                                '    <button onclick="saveEdit(' + nal.id + ')">Save</button>'
+                            document.getElementById("pr").innerHTML = res
+                        }
+                        ,
+                        error: function (error) {
+                        }
+                    });
+
+                }
+            })
+        }
+
+        function saveEdit(id) {
+            let name = document.getElementById("name").value;
+            let price = document.getElementById("price").value;
+            let img = document.getElementById("img").value;
+            let idCategory = document.getElementById("idCategory").value;
+            let nal = {
+                name: name,
+                price: price,
+                img: img,
+                category: {
+                    id: idCategory
+                }
+            }
+            console.log(nal)
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                type: "PUT",
+                url: "http://localhost:8080/api/products/" + id,
+                data: JSON.stringify(nal),
+                success: alert("ảo"),
+                error: function (error) {
+                }
+            });
+        }
+
+        function deleteById(id) {
+            if (confirm("Bạn có thật sự muốn xoá?")) {
+                $.ajax({
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    type: "DELETE",
+                    url: "http://localhost:8080/api/products/" + id,
+                    success: getAllStudent,
+                    error: function (error) {
+                    }
+                });
+            }
+        }
+
+        function findOne(id) {
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/api/products/" + id,
+                success: function (nal) {
+                    document.getElementById("pr").innerHTML = "<p>" + 'Tên   :   ' + nal.name + "</p>" +
+                        "<p>" + 'Gía  :   ' + nal.price + "</p>" +
+                        "<p>" + 'Thể loại :   ' + nal.category.name + "</p>"
+
+                }
+            })
+        }
+
+        function findByName() {
+            let key = document.getElementById("key").value;
+            console.log(key)
+            $.ajax({
+                type: "Get",
+                url: "http://localhost:8080/api/products/key/" + key,
+                success: function (nal) {
+                    console.log(nal)
+                    display(nal.content)
+
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+        }
+        function findAllByOrderByPriceDesc(){
+            $.ajax({
+                type: "Get",
+                url: "http://localhost:8080/api/products/sort",
+                success:function (nal){
+                    console.log(nal)
+                    display(nal.content)
+
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+<button onclick="getAllStudent()">
+    list Product
+</button>
+<button onclick="showFormAddStudent()">
+    add Product
+</button>
+<button onclick="findAllByOrderByPriceDesc()">
+    sort by price
+</button>
+
+
+<input type="text" id="key">
+<button onclick="findByName()"> search</button>
+
+
+<center>
+    <div id="pr">
+    </div>
+</center>
+</body>
+</html>
